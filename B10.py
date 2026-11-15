@@ -74,17 +74,17 @@ class SmartDoor(IDevice, ILockable):
 
 # SINGLETON: HomeConfiguration
 class HomeConfiguration:
-    """Singleton – chỉ có một thể hiện cấu hình ngôi nhà"""
+    """Singleton chỉ có một thể hiện cấu hình ngôi nhà"""
     _instance: Optional["HomeConfiguration"] = None
     _lock = threading.Lock()
 
     def __new__(cls):
-       if cls._instance is None:
+        if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
                     inst = super().__new__(cls)
                     inst.owner_name = "Đào Văn Tuyến"
-                    inst.night_light_level = 30   # %
+                    inst.night_light_level = 30  # %
                     cls._instance = inst
         return cls._instance
 
@@ -180,13 +180,9 @@ def main():
                 print(f"Đã tạo: {type(new_dev).__name__} – {name}")
                 devices[dtype] = new_dev
                 # Cập nhật facade nếu cần
-                if dtype == "light":
-                    facade = SmartHomeFacade(new_dev, devices["fan"], devices["door"])  # type: ignore
-                elif dtype == "fan":
-                    facade = SmartHomeFacade(devices["light"], new_dev, devices["door"])  # type: ignore
-                elif dtype == "door":
-                    facade = SmartHomeFacade(devices["light"], devices["fan"], new_dev)  # type: ignore
-
+                devices[dtype] = new_dev
+                # Dựng lại facade từ dict thiết bị hiện tại
+                facade = SmartHomeFacade(devices["light"], devices["fan"], devices["door"])  # type: ignore
             elif choice == "2":
                 print("Thiết bị hiện có:", list(devices.keys()))
                 key = input("Chọn thiết bị: ").strip().lower()
